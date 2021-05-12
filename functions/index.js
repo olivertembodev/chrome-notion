@@ -3,6 +3,14 @@ const admin = require('firebase-admin')
 const firebase = require('firebase')
 require('firebase/firestore')
 
+const express = require('express')
+const cors = require('cors')
+
+const app = express()
+
+// Automatically allow cross-origin requests
+app.use(cors())
+
 // const firebaseConfig = {
 //   apiKey: 'AIzaSyCv34L3w2BlDgf2fdZQ7GKlzZuVj1NiJU8',
 //   authDomain: 'chrome-notion.firebaseapp.com',
@@ -90,6 +98,44 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
   return res.json({ discussion, comments })
 })
 
+app.post('/getPostDiscussions', async (req, res) => {
+  const { notionId } = req.body
+
+  const discussionsRef = admin
+    .firestore()
+    .collection('discussions')
+    .where('notionId', '==', notionId)
+
+  let discussions = []
+  const snapshot = await discussionsRef.get()
+  snapshot.forEach((doc) => {
+    console.log(doc.id, '=>', doc.data())
+    discussions.push({ id: doc.id, ...doc.data() })
+  })
+
+  return res.json({ discussions })
+})
+
+// exports.getPostDiscussions = functions.https.onRequest(async (req, res) => {
+//   res.set('Access-Control-Allow-Origin', '*')
+//   // res.set('Access-Control-Allow-Credentials', 'true')
+//   const { notionId } = req.body
+
+//   const discussionsRef = admin
+//     .firestore()
+//     .collection('discussions')
+//     .where('notionId', '==', notionId)
+
+//   let discussions = []
+//   const snapshot = await discussionsRef.get()
+//   snapshot.forEach((doc) => {
+//     console.log(doc.id, '=>', doc.data())
+//     discussions.push({ id: doc.id, ...doc.data() })
+//   })
+
+//   return res.json({ discussions })
+// })
+
 exports.makeUppercase = functions.firestore
   .document('/messages/{documentId}')
   .onCreate((snap, context) => {
@@ -106,3 +152,5 @@ exports.makeUppercase = functions.firestore
     // Setting an 'uppercase' field in Firestore document returns a Promise.
     return snap.ref.set({ uppercase }, { merge: true })
   })
+
+exports.widgets = functions.https.onRequest(app)
