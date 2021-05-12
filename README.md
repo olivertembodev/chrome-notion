@@ -31,3 +31,27 @@ id
 email
 firstName
 lastName
+
+Different types of notion texts with css classes:
+notion-page-content //the main div which contains multiple stuff like this
+
+// each block has an id -> data-block-id, which is the blockId in the discussion field
+notion-text-block
+notion-header-block
+notion-divider-block
+notion-to_do-block
+notion-page-block
+notion-bookmark-block
+
+// code for getting blockIds from all elements in current page
+let pageContent = document.querySelector('.notion-page-content')
+let pageContentElements = [...pageContent.children]
+pageContentElements.forEach(elem => console.log(elem.attributes["data-block-id"].nodeValue))
+
+// context menu
+let scrollers = [...document.querySelectorAll('.notion-scroller.vertical')]
+let contextMenu = scrollers[scrollers.length - 1]
+
+// get comment div in context menu
+let bubbles = document.querySelector('.speechBubbleThin')
+console.log(bubbles.parentElement.parentElement.parentElement.parentElement.parentElement)

@@ -16,18 +16,18 @@
 
 .discussion-box {
   width: 100%;
+  padding: 20px;
   background: var(--discussion-background);
 }
 
 .collapse {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  padding: 10px 20px;
+  top: 20px;
+  right: 20px;
+  padding: 5px 10px;
 }
 
 .messages {
-  padding: 20px;
   font-family: var(--font-family);
   font-size: var(--font-size);
 }
@@ -62,6 +62,17 @@
   padding: 10px 50px;
 }
 
+.comment-box {
+  display: flex;
+  margin-top: 20px;
+}
+
+.comment-box input {
+  width: 100%;
+  margin-left: 45px;
+  margin-right: 10px;
+}
+
 /* list */
 .header-list-item {
   padding: 2px 30px;
@@ -84,4 +95,24 @@
   list-style-position: outside;
   list-style-type: circle;
   margin-bottom: 10px;
+}
+
+.discussion-context {
+  padding: 6px 0;
+  box-shadow: rgba(55, 53, 47, 0.09) 0px -1px 0px;
+  margin-top: 1px;
+}
+
+.discussion-context-text {
+  user-select: none;
+  transition: background 20ms ease-in 0s;
+  cursor: pointer;
+  width: 100%;
+  padding: 0 16px;
+  padding-left: 40px;
+  font-size: var(--font-size);
+}
+
+.discussion-context-text:hover {
+  background: rgba(55, 53, 47, 0.08);
 }
