@@ -54,3 +54,48 @@ setTimeout(() => {
   prepareData(headings)
   console.log(getCurrentId(), getCurrentUser())
 }, 1000)
+
+// Select the node that will be observed for mutations
+const targetNode = document.getElementById('notion-app')
+
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: true, subtree: true }
+
+// Callback function to execute when mutations are observed
+const callback = function (mutationsList, observer) {
+  // Use traditional 'for loops' for IE 11
+  for (const mutation of mutationsList) {
+    if (
+      mutation.type === 'childList' &&
+      document.querySelector('.speechBubbleThin') &&
+      !document.querySelector('.discussion-context')
+    ) {
+      console.log('am deschis meniul')
+      let bubbles = document.querySelector('.speechBubbleThin')
+
+      var newNode = document.createElement('div')
+
+      var newNode2 = document.createElement('div')
+      newNode2.innerText = 'Discussion'
+
+      newNode.classList.add('discussion-context')
+      newNode2.classList.add('discussion-context-text')
+      newNode.appendChild(newNode2)
+      newNode.onclick = () => console.log(getCurrentUser())
+
+      let commentDivBlock =
+        bubbles.parentElement.parentElement.parentElement.parentElement
+          .parentElement
+      commentDivBlock.parentNode.insertBefore(
+        newNode,
+        commentDivBlock.nextSibling
+      )
+    }
+  }
+}
+
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback)
+
+// Start observing the target node for configured mutations
+observer.observe(targetNode, config)
