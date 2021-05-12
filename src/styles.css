@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+:root {
+  --discussion-background: #354531;
+  --message-text: #ffffff;
+  --message-timestamp: #a5a3a3;
+}
+
+.discussion-box {
+  width: 100%;
+  background: var(--discussion-background);
+}
+
+.collapse {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.messages {
+  padding: 20px;
+}
+
+.message-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-name {
+  padding: 0 10px;
+  color: var(--message-text);
+}
+
+.timestamp {
+  color: var(--message-timestamp);
+}
+
+.message-text {
+  color: var(--message-text);
+  padding: 10px 50px;
+}
+
+/* list */
+.header-list-item {
+  padding: 2px 30px;
+  list-style-position: outside;
+  list-style-type: circle;
+}
+
+.header-list-item a {
+  color: inherit;
+}
+
+.header-list-item:hover {
+  background: rgba(55, 53, 47, 0.08);
+  cursor: pointer;
+}
+
+.header-list-item:last-child {
+  padding: 2px 30px;
+  list-style-position: outside;
+  list-style-type: circle;
+  margin-bottom: 10px;
+}

@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Notion Discussion Extension",
+  "version": "1.0.0",
+  "description": "Notion Extension",
+  "content_scripts": [
+    {
+      "matches": ["https://www.notion.so/*"],
+      "css": ["styles.css"],
+      "js": ["content_script.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
