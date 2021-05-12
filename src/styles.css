@@ -4,15 +4,14 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: bold;
 }
 
 :root {
   --discussion-background: #354531;
   --message-text: #ffffff;
   --message-timestamp: #a5a3a3;
+  --font-family: 'Roboto', sans-serif;
+  --font-size: 14px;
 }
 
 .discussion-box {
@@ -24,15 +23,21 @@
   position: absolute;
   top: 5px;
   right: 5px;
+  padding: 10px 20px;
 }
 
 .messages {
   padding: 20px;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
 }
 
 .message-info {
   display: flex;
   align-items: center;
+  font-weight: bold;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .avatar {
@@ -44,10 +49,12 @@
 .user-name {
   padding: 0 10px;
   color: var(--message-text);
+  font-weight: bold;
 }
 
 .timestamp {
   color: var(--message-timestamp);
+  font-weight: bold;
 }
 
 .message-text {
@@ -64,6 +71,7 @@
 
 .header-list-item a {
   color: inherit;
+  font-size: var(--font-size);
 }
 
 .header-list-item:hover {
