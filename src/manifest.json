@@ -7,8 +7,19 @@
     {
       "matches": ["https://www.notion.so/*"],
       "css": ["styles.css"],
-      "js": ["content_script.js"],
+      "js": [
+        "app.js",
+        "getCurrentId.js",
+        "getCurrentUser.js",
+        "headings.js",
+        "lookIfDeleted.js"
+      ],
       "run_at": "document_end"
     }
+  ],
+  "web_accessible_resources": [
+    "template.html",
+    "sendComment.js",
+    "getCurrentUser.js"
   ]
 }

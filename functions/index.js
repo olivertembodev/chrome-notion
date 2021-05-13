@@ -3,13 +3,7 @@ const admin = require('firebase-admin')
 const firebase = require('firebase')
 require('firebase/firestore')
 
-const express = require('express')
-const cors = require('cors')
-
-const app = express()
-
-// Automatically allow cross-origin requests
-app.use(cors())
+const cors = require('cors')({ origin: true })
 
 // const firebaseConfig = {
 //   apiKey: 'AIzaSyCv34L3w2BlDgf2fdZQ7GKlzZuVj1NiJU8',
@@ -37,13 +31,27 @@ exports.addDiscussion = functions.https.onRequest(async (req, res) => {
 })
 
 exports.addComment = functions.https.onRequest(async (req, res) => {
-  const { message, discussionId, userId } = req.body
-  const writeResult = await admin
-    .firestore()
-    .collection('comments')
-    .add({ message, date: new Date(), discussionId, userId })
+  return cors(req, res, async () => {
+    const { message, discussionId, email } = req.body
 
-  res.json({ result: `Comment with ID: ${writeResult.id} added.` })
+    const usersRef = admin
+      .firestore()
+      .collection('users')
+      .where('email', '==', email)
+
+    let user
+    const snapshot = await usersRef.get()
+    snapshot.forEach((doc) => {
+      user = { id: doc.id, ...doc.data() }
+    })
+
+    const writeResult = await admin
+      .firestore()
+      .collection('comments')
+      .add({ message, date: new Date(), discussionId, email })
+
+    res.json({ result: `Comment with ID: ${writeResult.id} added.` })
+  })
 })
 
 exports.addUser = functions.https.onRequest(async (req, res) => {
@@ -85,56 +93,32 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
     comments.push({ id: doc.id, ...doc.data() })
   })
 
-  for (const comment of comments) {
-    console.log(comment)
-    let user = await admin
-      .firestore()
-      .collection('users')
-      .doc(comment.userId)
-      .get()
-    comment.user = user.data()
-  }
-
   return res.json({ discussion, comments })
 })
 
-app.post('/getPostDiscussions', async (req, res) => {
-  const { notionId } = req.body
+exports.getPostDiscussions = functions.https.onRequest((req, res) => {
+  return cors(req, res, async () => {
+    try {
+      const { notionId } = req.body
 
-  const discussionsRef = admin
-    .firestore()
-    .collection('discussions')
-    .where('notionId', '==', notionId)
+      const discussionsRef = admin
+        .firestore()
+        .collection('discussions')
+        .where('notionId', '==', notionId)
 
-  let discussions = []
-  const snapshot = await discussionsRef.get()
-  snapshot.forEach((doc) => {
-    console.log(doc.id, '=>', doc.data())
-    discussions.push({ id: doc.id, ...doc.data() })
+      let discussions = []
+      const snapshot = await discussionsRef.get()
+      snapshot.forEach((doc) => {
+        console.log(doc.id, '=>', doc.data())
+        discussions.push({ id: doc.id, ...doc.data() })
+      })
+
+      return res.json({ discussions })
+    } catch (error) {
+      res.send(error)
+    }
   })
-
-  return res.json({ discussions })
 })
-
-// exports.getPostDiscussions = functions.https.onRequest(async (req, res) => {
-//   res.set('Access-Control-Allow-Origin', '*')
-//   // res.set('Access-Control-Allow-Credentials', 'true')
-//   const { notionId } = req.body
-
-//   const discussionsRef = admin
-//     .firestore()
-//     .collection('discussions')
-//     .where('notionId', '==', notionId)
-
-//   let discussions = []
-//   const snapshot = await discussionsRef.get()
-//   snapshot.forEach((doc) => {
-//     console.log(doc.id, '=>', doc.data())
-//     discussions.push({ id: doc.id, ...doc.data() })
-//   })
-
-//   return res.json({ discussions })
-// })
 
 exports.makeUppercase = functions.firestore
   .document('/messages/{documentId}')
@@ -153,4 +137,4 @@ exports.makeUppercase = functions.firestore
     return snap.ref.set({ uppercase }, { merge: true })
   })
 
-exports.widgets = functions.https.onRequest(app)
+// exports.widgets = functions.https.onRequest(app)
