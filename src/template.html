@@ -1,0 +1,26 @@
+<div class="discussion-box">
+    <button class="collapse" onclick="this.parentElement.remove()">
+        Collapse
+    </button>
+    <div class="messages">
+        <div class="message">
+            <div class="message-info">
+                <img class="avatar"
+                    src="https://pixinvent.com/materialize-material-design-admin-template/app-assets/images/user/12.jpg"
+                    alt="user-avatar">
+                <span class="user-name">Sam Corcos</span>
+                <span class="timestamp">on Mar 8</span>
+            </div>
+            <div class="message-text">I like this idea! Let's do it!</div>
+            <div class="message-text">I like this idea! Let's do it!</div>
+            <div class="message-text">I like this idea! Let's do it!</div>
+
+        </div>
+    </div>
+    <div class="comment-box">
+        <input type="text" onClick='event.stopPropagation();this.focus()'
+            onKeyDown="event.stopPropagation();this.focus()" onKeyPress="event.stopPropagation();this.focus()" />
+        <button class="comment-button"
+            onclick="event.stopPropagation();sendComment(this.parentElement.children[0].value, this.parentElement.parentElement.attributes.blockid.value)">Comment</button>
+    </div>
+</div>

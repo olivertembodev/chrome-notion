@@ -1,33 +1,40 @@
 Part I
 
-- mini map of placeholder h1 like google docs (done)
+[x] mini map of placeholder h1 like google docs (done)
 
 Part II
 capture data in chrome extension
 
-- Discussion button (separate comment feature)
-- Individual blocks -> separate discussions (Pic, name, date, comment) (done)
-- Collapse button
-- Other icon for message (or maybe the same one)
-- get the uuid of the post (done)
-- get user data from notion (done)
-- show discussion on deleted block
+[x] Individual blocks -> separate discussions (Pic, name, date, comment)
+[x] Collapse button (done)
+[x] get the uuid of the post (done)
+[x] get user data from notion (done)
+[x] Discussion button (separate comment feature) (done)
+[x] get messages for block, api (done)
 
-discussions
-id
-notionId // to which notion uuid is referring
-blockId // to which block of the content is referring
-// also show something to know when it's deleted
+[ ] display messages in block
+[ ] api function to verify if block is deleted and then update db
+[ ] Other icon for message (or maybe the same one, get number of comments and display it there)
+[ ] show discussions on deleted block
+[ ] fix "Discussion" button sometimes disappearing
 
-comments
-id
-message
-date
-discussionId (FK)
-userId (FK)
-
-users
-id
-email
-firstName
-lastName
+<br>
+DB SCHEMA:<br>
+discussions<br>
+id<br>
+notionId // to which notion uuid is referring<br>
+blockId // to which block of the content is referring<br>
+deleted<br>
+<br><br>
+comments<br>
+id<br>
+message<br>
+date<br>
+discussionId (FK)<br>
+userId (FK)<br>
+<br><br>
+users<br>
+id<br>
+email<br>
+firstName<br>
+lastName<br>
