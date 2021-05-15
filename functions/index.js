@@ -16,9 +16,35 @@ const cors = require('cors')({ origin: true })
 //   appId: '1:940135582054:web:8637cb4d862fa0420160a7',
 // }
 // firebase.initializeApp(firebaseConfig)
-// let db = firebase.firestore()
+// let admin.firestore() = firebase.firestore()
 
 admin.initializeApp()
+
+const month_names_short = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+const findUserByEmail = async (email) => {
+  const user = await admin
+    .firestore()
+    .collection('users')
+    .where('email', '==', email)
+    .get()
+
+  if (!user.empty) return user.docs[0].data()
+  else return {}
+}
 
 exports.addDiscussion = functions.https.onRequest(async (req, res) => {
   const { notionId, blockId } = req.body
@@ -32,23 +58,12 @@ exports.addDiscussion = functions.https.onRequest(async (req, res) => {
 
 exports.addComment = functions.https.onRequest(async (req, res) => {
   return cors(req, res, async () => {
-    const { message, discussionId, email } = req.body
-
-    const usersRef = admin
-      .firestore()
-      .collection('users')
-      .where('email', '==', email)
-
-    let user
-    const snapshot = await usersRef.get()
-    snapshot.forEach((doc) => {
-      user = { id: doc.id, ...doc.data() }
-    })
+    const { message, blockId, email } = req.body
 
     const writeResult = await admin
       .firestore()
       .collection('comments')
-      .add({ message, date: new Date(), discussionId, email })
+      .add({ message, date: new Date(), blockId, email })
 
     res.json({ result: `Comment with ID: ${writeResult.id} added.` })
   })
@@ -66,34 +81,48 @@ exports.addUser = functions.https.onRequest(async (req, res) => {
 })
 
 exports.getDiscussion = functions.https.onRequest(async (req, res) => {
-  const { blockId } = req.body
+  return cors(req, res, async () => {
+    const { blockId } = req.body
 
-  const discussionsRef = admin
-    .firestore()
-    .collection('discussions')
-    .where('blockId', '==', blockId)
+    const discussionsRef = admin
+      .firestore()
+      .collection('discussions')
+      .where('blockId', '==', blockId)
 
-  let discussion
-  const snapshot = await discussionsRef.get()
-  snapshot.forEach((doc) => {
-    console.log(doc.id, '=>', doc.data())
-    discussion = { id: doc.id, blockId: doc.data().blockId }
+    let discussion
+    const snapshot = await discussionsRef.get()
+    snapshot.forEach((doc) => {
+      discussion = { id: doc.id, ...doc.data() }
+    })
+
+    let comments = []
+
+    const commentsRef = await admin
+      .firestore()
+      .collection('comments')
+      .where('blockId', '==', discussion.blockId)
+      .get()
+
+    let realComments = []
+
+    commentsRef.forEach((doc) => {
+      realComments.push({ ...doc.data() })
+    })
+
+    for (const comment of realComments) {
+      let user = await findUserByEmail(comment.email)
+      let date = toDateTime(comment.date._seconds)
+      comment.date = `on ${
+        month_names_short[date.getMonth()]
+      } ${date.getDate()}`
+
+      comments.push({ ...comment, ...user })
+    }
+
+    comments.reverse()
+
+    return res.json({ discussion, comments })
   })
-
-  let comments = []
-
-  const commentsRef = admin
-    .firestore()
-    .collection('comments')
-    .where('discussionId', '==', discussion.id)
-
-  const snapshot2 = await commentsRef.get()
-
-  snapshot2.forEach((doc) => {
-    comments.push({ id: doc.id, ...doc.data() })
-  })
-
-  return res.json({ discussion, comments })
 })
 
 exports.getPostDiscussions = functions.https.onRequest((req, res) => {
@@ -120,21 +149,34 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
   })
 })
 
-exports.makeUppercase = functions.firestore
-  .document('/messages/{documentId}')
-  .onCreate((snap, context) => {
-    // Grab the current value of what was written to Firestore.
-    const original = snap.data().original
+// exports.verifyDeleted = functions.https.onRequest((req, res) => {
+//   return cors(req, res, async () => {
+//     try {
+//       const { deletedBlockIds, notionId } = req.body
 
-    // Access the parameter `{documentId}` with `context.params`
-    functions.logger.log('Uppercasing', context.params.documentId, original)
+//       const discussions = await admin
+//         .firestore()
+//         .collection('discussions')
+//         .where('notionId', '==', notionId)
+//         .get()
 
-    const uppercase = original.toUpperCase()
+//       let discussions = []
+//       let user = {}
+//       const snapshot = await discussionsRef.get()
+//       snapshot.forEach((doc) => {
+//         console.log(doc.id, '=>', doc.data())
+//         discussions.push({ id: doc.id, ...doc.data() })
+//       })
 
-    // You must return a Promise when performing asynchronous tasks inside a Functions such as
-    // writing to Firestore.
-    // Setting an 'uppercase' field in Firestore document returns a Promise.
-    return snap.ref.set({ uppercase }, { merge: true })
-  })
+//       return res.json({ discussions })
+//     } catch (error) {
+//       res.send(error)
+//     }
+//   })
+// })
 
-// exports.widgets = functions.https.onRequest(app)
+function toDateTime(secs) {
+  var time = new Date(1970, 0, 1) // Epoch
+  time.setSeconds(secs)
+  return time
+}

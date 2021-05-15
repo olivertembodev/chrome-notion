@@ -1,4 +1,4 @@
-const clickDiscussion = () => {
+const clickDiscussion = async () => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
 
@@ -7,30 +7,44 @@ const clickDiscussion = () => {
   )
 
   let blockId = ''
+  let discussion
 
   if (selectedBlock.length > 0) {
     blockId = selectedBlock[0].attributes['0'].value
-    console.log({
-      uuid: getCurrentId(),
-      blockId,
-    })
+
+    discussion = await getDiscussion(blockId)
+    console.log(discussion)
   }
 
-  fetch(chrome.runtime.getURL('/template.html'))
-    .then((r) => r.text())
-    .then((html) => {
-      // let trueHtml = createElementFromHTML(html)
-      // console.log(trueHtml.textContent)
-      let container = document.createElement('div')
-      container.innerHTML = html
-      container
-        .querySelector('.discussion-box')
-        .setAttribute('blockId', blockId)
-      selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
-      document.querySelectorAll('.user-name')[0].textContent =
-        getCurrentUser().firstName
-      // not using innerHTML as it would break js event listeners of the page
-    })
+  let response = await fetch(chrome.runtime.getURL('/template.html'))
+  let html = await response.text()
+
+  //create discussion container
+  let container = document.createElement('div')
+  container.innerHTML = html
+
+  //insert messages
+  let messages = discussion.comments.map((comment) => {
+    const { firstName, lastName, date, message } = comment
+    let messageDiv = container.querySelector('.message').cloneNode(true)
+
+    messageDiv.querySelector('.avatar').innerText = firstName[0]
+    messageDiv.querySelector('.timestamp').innerText = date
+
+    messageDiv.querySelector(
+      '.user-name'
+    ).innerText = `${firstName} ${lastName}`
+
+    messageDiv.querySelector('.message-text').innerText = message
+    return messageDiv.outerHTML
+  })
+
+  container.querySelector('.messages').innerHTML = messages.join()
+
+  container.querySelector('.discussion-box').setAttribute('blockId', blockId)
+  selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
+  // document.querySelectorAll('.user-name')[0].textContent =
+  //   getCurrentUser().firstName
 }
 
 // Select the node that will be observed for mutations

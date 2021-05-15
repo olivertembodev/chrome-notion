@@ -42,9 +42,14 @@
 }
 
 .avatar {
+  background: grey;
+  color: white;
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  font-size: 20px;
+  display: grid;
+  place-items: center;
 }
 
 .user-name {

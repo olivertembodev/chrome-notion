@@ -9,6 +9,7 @@
       "css": ["styles.css"],
       "js": [
         "app.js",
+        "getDiscussion.js",
         "getCurrentId.js",
         "getCurrentUser.js",
         "headings.js",
