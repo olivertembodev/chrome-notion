@@ -11,9 +11,7 @@ const clickDiscussion = async () => {
 
   if (selectedBlock.length > 0) {
     blockId = selectedBlock[0].attributes['0'].value
-
-    discussion = await getDiscussion(blockId)
-    console.log(discussion)
+    discussion = await getDiscussion(getCurrentId(), blockId)
   }
 
   let response = await fetch(chrome.runtime.getURL('/template.html'))
@@ -22,6 +20,10 @@ const clickDiscussion = async () => {
   //create discussion container
   let container = document.createElement('div')
   container.innerHTML = html
+
+  if (discussion.comments.length === 0) {
+    container.querySelector('.no-comments').style.display = 'block'
+  }
 
   //insert messages
   let messages = discussion.comments.map((comment) => {
@@ -43,8 +45,6 @@ const clickDiscussion = async () => {
 
   container.querySelector('.discussion-box').setAttribute('blockId', blockId)
   selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
-  // document.querySelectorAll('.user-name')[0].textContent =
-  //   getCurrentUser().firstName
 }
 
 // Select the node that will be observed for mutations

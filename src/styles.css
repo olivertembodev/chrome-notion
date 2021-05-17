@@ -122,3 +122,9 @@
 .discussion-context-text:hover {
   background: rgba(55, 53, 47, 0.08);
 }
+
+.no-comments {
+  color: var(--message-text);
+  height: 50px;
+  text-align: center;
+}
