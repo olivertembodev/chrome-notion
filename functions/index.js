@@ -65,7 +65,12 @@ exports.addComment = functions.https.onRequest(async (req, res) => {
       .collection('comments')
       .add({ message, date: new Date(), blockId, email })
 
-    res.json({ result: `Comment with ID: ${writeResult.id} added.` })
+    let user = await findUserByEmail(email)
+
+    res.json({
+      result: `Comment with ID: ${writeResult.id} added.`,
+      user,
+    })
   })
 })
 

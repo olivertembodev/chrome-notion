@@ -14,9 +14,12 @@
         </div>
     </div>
     <div class="comment-box">
-        <input type="text" onClick='event.stopPropagation();this.focus()'
+        <input class="comment-input" type="text" onClick='event.stopPropagation();this.focus()'
             onKeyDown="event.stopPropagation();this.focus()" onKeyPress="event.stopPropagation();this.focus()" />
-        <button class="comment-button"
-            onclick="event.stopPropagation();sendComment(this.parentElement.children[0].value, this.parentElement.parentElement.attributes.blockid.value)">Comment</button>
+        <button class="comment-button" onclick="event.stopPropagation();
+            sendComment(this.parentElement.children[0].value, this.parentElement.parentElement.attributes.blockid.value, this.parentElement.parentElement.querySelector('.messages'));
+            ">
+            Comment
+        </button>
     </div>
 </div>
