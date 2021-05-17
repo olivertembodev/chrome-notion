@@ -1,4 +1,4 @@
-async function getDiscussion(blockId) {
+async function getDiscussion(notionId, blockId) {
   let res = await fetch(
     'http://localhost:5001/chrome-notion/us-central1/getDiscussion',
     {
@@ -7,6 +7,7 @@ async function getDiscussion(blockId) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        notionId,
         blockId,
       }),
     }

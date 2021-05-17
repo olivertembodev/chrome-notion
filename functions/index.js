@@ -43,29 +43,42 @@ const findUserByEmail = async (email) => {
     .get()
 
   if (!user.empty) return user.docs[0].data()
-  else return {}
+  else throw Error('No user')
 }
 
-exports.addDiscussion = functions.https.onRequest(async (req, res) => {
-  const { notionId, blockId } = req.body
-  const writeResult = await admin
+const addDiscussion = async (notionId, blockId) => {
+  await admin
     .firestore()
     .collection('discussions')
     .add({ blockId, notionId, deleted: false })
+}
 
-  res.json({ result: `Discussion with ID: ${writeResult.id} created.` })
-})
+const addUser = async (email, firstName, lastName) => {
+  await admin
+    .firestore()
+    .collection('users')
+    .add({ email, firstName, lastName })
+}
 
 exports.addComment = functions.https.onRequest(async (req, res) => {
   return cors(req, res, async () => {
-    const { message, blockId, email } = req.body
+    const {
+      message,
+      blockId,
+      user: { email, firstName, lastName },
+    } = req.body
 
     const writeResult = await admin
       .firestore()
       .collection('comments')
       .add({ message, date: new Date(), blockId, email })
 
-    let user = await findUserByEmail(email)
+    let user
+    try {
+      user = await findUserByEmail(email)
+    } catch (error) {
+      addUser(email, firstName, lastName)
+    }
 
     res.json({
       result: `Comment with ID: ${writeResult.id} added.`,
@@ -74,28 +87,24 @@ exports.addComment = functions.https.onRequest(async (req, res) => {
   })
 })
 
-exports.addUser = functions.https.onRequest(async (req, res) => {
-  const { email, firstName, lastName } = req.body
-
-  const writeResult = await admin
-    .firestore()
-    .collection('users')
-    .add({ email, firstName, lastName })
-
-  res.json({ result: `User with ID: ${writeResult.id} added.` })
-})
-
 exports.getDiscussion = functions.https.onRequest(async (req, res) => {
   return cors(req, res, async () => {
-    const { blockId } = req.body
+    const { notionId, blockId } = req.body
 
-    const discussionsRef = admin
+    console.log(blockId)
+
+    const snapshot = await admin
       .firestore()
       .collection('discussions')
       .where('blockId', '==', blockId)
+      .get()
+
+    if (snapshot.empty) {
+      addDiscussion(notionId, blockId)
+      return res.json({ comments: [] })
+    }
 
     let discussion
-    const snapshot = await discussionsRef.get()
     snapshot.forEach((doc) => {
       discussion = { id: doc.id, ...doc.data() }
     })
@@ -106,6 +115,7 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
       .firestore()
       .collection('comments')
       .where('blockId', '==', discussion.blockId)
+      .orderBy('date', 'desc')
       .get()
 
     let realComments = []
@@ -117,6 +127,7 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
     for (const comment of realComments) {
       let user = await findUserByEmail(comment.email)
       let date = toDateTime(comment.date._seconds)
+      // comment.date = toDateTime(comment.date._seconds)
       comment.date = `on ${
         month_names_short[date.getMonth()]
       } ${date.getDate()}`

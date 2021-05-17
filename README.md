@@ -12,11 +12,11 @@ capture data in chrome extension
 [x] Discussion button (separate comment feature)
 [x] get messages for block, api
 [x] display messages in block
+[X] fix "Discussion" button sometimes disappearing
 
 [ ] api function to verify if block is deleted and then update db
 [ ] Other icon for message (or maybe the same one, get number of comments and display it there)
 [ ] show discussions on deleted block
-[ ] fix "Discussion" button sometimes disappearing
 [ ] have comments opened per user
 
 <br>
