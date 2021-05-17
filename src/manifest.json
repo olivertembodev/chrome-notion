@@ -20,7 +20,8 @@
   ],
   "web_accessible_resources": [
     "template.html",
-    "sendComment.js",
-    "getCurrentUser.js"
+    "getCurrentUser.js",
+    "getCurrentDate.js",
+    "sendComment.js"
   ]
 }

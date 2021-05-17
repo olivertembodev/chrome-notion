@@ -11,8 +11,8 @@ capture data in chrome extension
 [x] get user data from notion
 [x] Discussion button (separate comment feature)
 [x] get messages for block, api
+[x] display messages in block
 
-[ ] display messages in block
 [ ] api function to verify if block is deleted and then update db
 [ ] Other icon for message (or maybe the same one, get number of comments and display it there)
 [ ] show discussions on deleted block
