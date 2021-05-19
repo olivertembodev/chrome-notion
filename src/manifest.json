@@ -13,7 +13,7 @@
         "getCurrentId.js",
         "getCurrentUser.js",
         "headings.js",
-        "lookIfDeleted.js",
+        "showDeletedDiscussions.js",
         "deleteDiscussion.js"
       ],
       "run_at": "document_end"

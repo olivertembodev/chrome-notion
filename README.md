@@ -14,10 +14,11 @@ capture data in chrome extension
 [x] display messages in block
 [X] fix "Discussion" button sometimes disappearing
 [X] api function to verify if block is deleted and then update db
+[X] show discussions on deleted block
 
-[ ] show discussions on deleted block
 [ ] Other icon for message (or maybe the same one, get number of comments and display it there)
 [ ] have comments opened per user
+[ ] ?bug: on page change it has to be refreshed, because it's react
 
 <br>
 DB SCHEMA:<br>

@@ -21,6 +21,11 @@
   position: relative;
 }
 
+.discussion-box button,
+.discussion-box input {
+  color: black;
+}
+
 .collapse {
   position: absolute;
   top: 20px;
@@ -127,4 +132,8 @@
   color: var(--message-text);
   height: 50px;
   text-align: center;
+}
+
+#deleted-blocks-list {
+  width: 90%;
 }
