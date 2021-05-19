@@ -13,7 +13,8 @@
         "getCurrentId.js",
         "getCurrentUser.js",
         "headings.js",
-        "lookIfDeleted.js"
+        "lookIfDeleted.js",
+        "deleteDiscussion.js"
       ],
       "run_at": "document_end"
     }
@@ -22,6 +23,7 @@
     "template.html",
     "getCurrentUser.js",
     "getCurrentDate.js",
-    "sendComment.js"
+    "sendComment.js",
+    "deleteDiscussion.js"
   ]
 }
