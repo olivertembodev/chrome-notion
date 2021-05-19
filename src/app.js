@@ -1,3 +1,17 @@
+function getCurrentBlockId() {
+  let pageContent = document.querySelector('.notion-page-content')
+  let pageContentElements = [...pageContent.children]
+
+  const selectedBlock = pageContentElements.filter(
+    (elem) => elem.style['position'] === 'relative'
+  )
+
+  if (selectedBlock.length > 0) {
+    const blockId = selectedBlock[0].attributes['0'].value
+    return blockId
+  } else return null
+}
+
 const clickDiscussion = async () => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
@@ -62,6 +76,16 @@ const callback = function (mutationsList, observer) {
       document.querySelector('.speechBubbleThin') &&
       !document.querySelector('.discussion-context')
     ) {
+      // for delete api
+      const trashIcon = document.querySelector('.trash')
+      const trashButton = trashIcon.parentElement.parentElement.parentElement
+      trashButton.addEventListener('click', async () => {
+        const currentBlockId = getCurrentBlockId()
+        let res = await deleteDiscussion(currentBlockId)
+        console.log(res)
+      })
+
+      // for discussion button
       let bubbles = document.querySelector('.speechBubbleThin')
 
       var newNode = document.createElement('div')
@@ -95,24 +119,18 @@ setTimeout(() => {
   lookIfDeleted()
 }, 2000)
 
-// for commenting
-var s = document.createElement('script')
-s.src = chrome.runtime.getURL('sendComment.js')
-s.onload = function () {
-  this.remove()
-}
-;(document.head || document.documentElement).appendChild(s)
+const scriptsToAppend = [
+  'sendComment.js',
+  'deleteDiscussion.js',
+  'getCurrentUser.js',
+  'getCurrentDate.js',
+]
 
-var s2 = document.createElement('script')
-s2.src = chrome.runtime.getURL('getCurrentUser.js')
-s2.onload = function () {
-  this.remove()
-}
-;(document.head || document.documentElement).appendChild(s2)
-
-var s3 = document.createElement('script')
-s3.src = chrome.runtime.getURL('getCurrentDate.js')
-s3.onload = function () {
-  this.remove()
-}
-;(document.head || document.documentElement).appendChild(s3)
+scriptsToAppend.forEach((scriptUrl) => {
+  var s = document.createElement('script')
+  s.src = chrome.runtime.getURL(scriptUrl)
+  s.onload = function () {
+    this.remove()
+  }
+  ;(document.head || document.documentElement).appendChild(s)
+})

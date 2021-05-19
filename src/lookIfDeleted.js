@@ -1,4 +1,10 @@
 async function lookIfDeleted() {
+  const pageContent = document.querySelector('.notion-page-content')
+  const pageContentElements = [...pageContent.children]
+  const currentBlocks = pageContentElements.map(
+    (elem) => elem.attributes['0'].value
+  )
+
   const response = await fetch(
     'http://localhost:5001/chrome-notion/us-central1/getPostDiscussions',
     {
@@ -8,22 +14,10 @@ async function lookIfDeleted() {
       },
       body: JSON.stringify({
         notionId: getCurrentId(),
+        currentBlocks,
       }),
     }
   )
   let data = await response.json()
-  const dbBlockIds = data.discussions.map((elem) => elem.blockId)
-
-  let pageContent = document.querySelector('.notion-page-content')
-  let pageContentElements = [...pageContent.children]
-  let currentIds = pageContentElements.map((elem) => elem.attributes['0'].value)
-
-  let deletedBlockIds = dbBlockIds.filter((elem) => {
-    if (!currentIds.includes(elem)) return elem
-  })
-
-  if (deletedBlockIds.length > 0) {
-    console.log('these are the deleted blockIds:', deletedBlockIds)
-  }
-  return deletedBlockIds
+  console.log(data)
 }

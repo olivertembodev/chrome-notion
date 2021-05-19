@@ -53,6 +53,34 @@ const addDiscussion = async (notionId, blockId) => {
     .add({ blockId, notionId, deleted: false })
 }
 
+const deleteDiscussion = async (blockId) => {
+  try {
+    const discussion = await admin
+      .firestore()
+      .collection('discussions')
+      .where('blockId', '==', blockId)
+      .get()
+
+    let realDiscussion
+
+    if (!discussion.empty) {
+      discussion.forEach((doc) => {
+        realDiscussion = { id: doc.id, ...doc.data() }
+      })
+    }
+
+    if (realDiscussion) {
+      await admin
+        .firestore()
+        .collection('discussions')
+        .doc(realDiscussion.id)
+        .update({ deleted: true })
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const addUser = async (email, firstName, lastName) => {
   await admin
     .firestore()
@@ -91,8 +119,6 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
   return cors(req, res, async () => {
     const { notionId, blockId } = req.body
 
-    console.log(blockId)
-
     const snapshot = await admin
       .firestore()
       .collection('discussions')
@@ -127,7 +153,6 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
     for (const comment of realComments) {
       let user = await findUserByEmail(comment.email)
       let date = toDateTime(comment.date._seconds)
-      // comment.date = toDateTime(comment.date._seconds)
       comment.date = `on ${
         month_names_short[date.getMonth()]
       } ${date.getDate()}`
@@ -144,7 +169,7 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
 exports.getPostDiscussions = functions.https.onRequest((req, res) => {
   return cors(req, res, async () => {
     try {
-      const { notionId } = req.body
+      const { notionId, currentBlocks } = req.body
 
       const discussionsRef = admin
         .firestore()
@@ -154,9 +179,17 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
       let discussions = []
       const snapshot = await discussionsRef.get()
       snapshot.forEach((doc) => {
-        console.log(doc.id, '=>', doc.data())
         discussions.push({ id: doc.id, ...doc.data() })
       })
+
+      const dbBlockIds = discussions.map((elem) => elem.blockId)
+      let deletedBlockIds = dbBlockIds.filter((elem) => {
+        if (!currentBlocks.includes(elem)) return elem
+      })
+
+      if (deletedBlockIds.length > 0) {
+        console.log('these are the deleted blockIds:', deletedBlockIds)
+      }
 
       return res.json({ discussions })
     } catch (error) {
@@ -165,31 +198,17 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
   })
 })
 
-// exports.verifyDeleted = functions.https.onRequest((req, res) => {
-//   return cors(req, res, async () => {
-//     try {
-//       const { deletedBlockIds, notionId } = req.body
-
-//       const discussions = await admin
-//         .firestore()
-//         .collection('discussions')
-//         .where('notionId', '==', notionId)
-//         .get()
-
-//       let discussions = []
-//       let user = {}
-//       const snapshot = await discussionsRef.get()
-//       snapshot.forEach((doc) => {
-//         console.log(doc.id, '=>', doc.data())
-//         discussions.push({ id: doc.id, ...doc.data() })
-//       })
-
-//       return res.json({ discussions })
-//     } catch (error) {
-//       res.send(error)
-//     }
-//   })
-// })
+exports.deleteDiscussion = functions.https.onRequest((req, res) => {
+  return cors(req, res, async () => {
+    try {
+      const { blockId } = req.body
+      deleteDiscussion(blockId)
+      res.send('Success')
+    } catch (error) {
+      res.send(error)
+    }
+  })
+})
 
 function toDateTime(secs) {
   var time = new Date(1970, 0, 1) // Epoch
