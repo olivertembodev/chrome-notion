@@ -169,7 +169,7 @@ exports.getDiscussion = functions.https.onRequest(async (req, res) => {
 exports.getPostDiscussions = functions.https.onRequest((req, res) => {
   return cors(req, res, async () => {
     try {
-      const { notionId, currentBlocks } = req.body
+      const { notionId } = req.body
 
       const discussionsRef = admin
         .firestore()
@@ -182,16 +182,45 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
         discussions.push({ id: doc.id, ...doc.data() })
       })
 
-      const dbBlockIds = discussions.map((elem) => elem.blockId)
-      let deletedBlockIds = dbBlockIds.filter((elem) => {
-        if (!currentBlocks.includes(elem)) return elem
-      })
+      // for (const discussion of discussions) {
+      //   let comments = []
 
-      if (deletedBlockIds.length > 0) {
-        console.log('these are the deleted blockIds:', deletedBlockIds)
-      }
+      //   const commentsRef = await admin
+      //     .firestore()
+      //     .collection('comments')
+      //     .where('blockId', '==', discussion.blockId)
+      //     .orderBy('date', 'desc')
+      //     .get()
 
-      return res.json({ discussions })
+      //   let realComments = []
+
+      //   commentsRef.forEach((doc) => {
+      //     realComments.push({ ...doc.data() })
+      //   })
+
+      //   // for (const comment of realComments) {
+      //   //   let user = await findUserByEmail(comment.email)
+      //   //   let date = toDateTime(comment.date._seconds)
+      //   //   comment.date = `on ${
+      //   //     month_names_short[date.getMonth()]
+      //   //   } ${date.getDate()}`
+
+      //   //   comments.push({ ...comment, ...user })
+      //   // }
+
+      //   // comments.reverse()
+      //   // discussion = { ...discussion, comments }
+      //   console.log(discussion)
+      // }
+
+      const deletedDiscussions = discussions.filter(
+        (discussion) => discussion.deleted === true
+      )
+      const currentDiscussions = discussions.filter(
+        (discussion) => discussion.deleted === false
+      )
+
+      return res.json({ deletedDiscussions, currentDiscussions })
     } catch (error) {
       res.send(error)
     }

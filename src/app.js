@@ -12,6 +12,19 @@ function getCurrentBlockId() {
   } else return null
 }
 
+// const clickDeletedDiscussion = async () => {
+//   let response = await fetch(chrome.runtime.getURL('/template.html'))
+//   let html = await response.text()
+
+//   let container = document.createElement('div')
+//   container.id = 'deleted-discussion'
+//   container.innerHTML = html
+//   container.querySelector('.comment-box').style.display = 'none'
+
+//   const deletedBlocksList = document.getElementById('deleted-blocks-list')
+//   deletedBlocksList.append(container)
+// }
+
 const clickDiscussion = async () => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
@@ -116,7 +129,7 @@ observer.observe(targetNode, config)
 setTimeout(() => {
   let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
   showHeadings(headings)
-  lookIfDeleted()
+  showDeletedDiscussions()
 }, 2000)
 
 const scriptsToAppend = [
