@@ -25,7 +25,7 @@ function getCurrentBlockId() {
 //   deletedBlocksList.append(container)
 // }
 
-const clickDiscussion = async () => {
+const clickDiscussion = async (hasBlockId) => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
 
@@ -36,7 +36,12 @@ const clickDiscussion = async () => {
   let blockId = ''
   let discussion
 
-  if (selectedBlock.length > 0) {
+  if (hasBlockId) {
+    blockId = hasBlockId
+    discussion = await getDiscussion(getCurrentId(), blockId)
+  }
+
+  if (!hasBlockId && selectedBlock.length > 0) {
     blockId = selectedBlock[0].attributes['0'].value
     discussion = await getDiscussion(getCurrentId(), blockId)
   }
@@ -71,7 +76,15 @@ const clickDiscussion = async () => {
   container.querySelector('.messages').innerHTML = messages.join()
 
   container.querySelector('.discussion-box').setAttribute('blockId', blockId)
-  selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
+
+  if (hasBlockId) {
+    console.log(blockId)
+    pageContent
+      .querySelectorAll(`[data-block-id*=${blockId}]`)[0]
+      .insertAdjacentHTML('afterend', container.innerHTML)
+  } else {
+    selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
+  }
 }
 
 // Select the node that will be observed for mutations
@@ -109,7 +122,7 @@ const callback = function (mutationsList, observer) {
       newNode.classList.add('discussion-context')
       newNode2.classList.add('discussion-context-text')
       newNode.appendChild(newNode2)
-      newNode.onclick = clickDiscussion
+      newNode.onclick = () => clickDiscussion()
 
       let commentDivBlock =
         bubbles.parentElement.parentElement.parentElement.parentElement
@@ -130,6 +143,7 @@ setTimeout(() => {
   let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
   showHeadings(headings)
   showDeletedDiscussions()
+  // showCommentIcons()
 }, 2000)
 
 const scriptsToAppend = [

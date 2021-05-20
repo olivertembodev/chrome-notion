@@ -31,6 +31,8 @@ async function showDeletedDiscussions() {
     myDiv.append(discElement)
   })
   page.prepend(myDiv)
+
+  showCommentIcons(currentDiscussions)
 }
 
 const clickDeletedDiscussion = async (blockId) => {
