@@ -182,43 +182,23 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
         discussions.push({ id: doc.id, ...doc.data() })
       })
 
-      // for (const discussion of discussions) {
-      //   let comments = []
-
-      //   const commentsRef = await admin
-      //     .firestore()
-      //     .collection('comments')
-      //     .where('blockId', '==', discussion.blockId)
-      //     .orderBy('date', 'desc')
-      //     .get()
-
-      //   let realComments = []
-
-      //   commentsRef.forEach((doc) => {
-      //     realComments.push({ ...doc.data() })
-      //   })
-
-      //   // for (const comment of realComments) {
-      //   //   let user = await findUserByEmail(comment.email)
-      //   //   let date = toDateTime(comment.date._seconds)
-      //   //   comment.date = `on ${
-      //   //     month_names_short[date.getMonth()]
-      //   //   } ${date.getDate()}`
-
-      //   //   comments.push({ ...comment, ...user })
-      //   // }
-
-      //   // comments.reverse()
-      //   // discussion = { ...discussion, comments }
-      //   console.log(discussion)
-      // }
-
       const deletedDiscussions = discussions.filter(
         (discussion) => discussion.deleted === true
       )
       const currentDiscussions = discussions.filter(
         (discussion) => discussion.deleted === false
       )
+
+      for (const discussion of currentDiscussions) {
+        const commentsRef = await admin
+          .firestore()
+          .collection('comments')
+          .where('blockId', '==', discussion.blockId)
+          .orderBy('date', 'desc')
+          .get()
+
+        discussion.messages = commentsRef.size
+      }
 
       return res.json({ deletedDiscussions, currentDiscussions })
     } catch (error) {

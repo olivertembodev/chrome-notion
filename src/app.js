@@ -12,20 +12,7 @@ function getCurrentBlockId() {
   } else return null
 }
 
-// const clickDeletedDiscussion = async () => {
-//   let response = await fetch(chrome.runtime.getURL('/template.html'))
-//   let html = await response.text()
-
-//   let container = document.createElement('div')
-//   container.id = 'deleted-discussion'
-//   container.innerHTML = html
-//   container.querySelector('.comment-box').style.display = 'none'
-
-//   const deletedBlocksList = document.getElementById('deleted-blocks-list')
-//   deletedBlocksList.append(container)
-// }
-
-const clickDiscussion = async () => {
+const clickDiscussion = async (hasBlockId) => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
 
@@ -36,10 +23,15 @@ const clickDiscussion = async () => {
   let blockId = ''
   let discussion
 
-  if (selectedBlock.length > 0) {
-    blockId = selectedBlock[0].attributes['0'].value
-    discussion = await getDiscussion(getCurrentId(), blockId)
+  if (hasBlockId) {
+    blockId = hasBlockId
   }
+
+  if (!hasBlockId && selectedBlock.length > 0) {
+    blockId = selectedBlock[0].attributes['0'].value
+  }
+
+  discussion = await getDiscussion(getCurrentId(), blockId)
 
   let response = await fetch(chrome.runtime.getURL('/template.html'))
   let html = await response.text()
@@ -48,6 +40,7 @@ const clickDiscussion = async () => {
   let container = document.createElement('div')
   container.innerHTML = html
 
+  console.log(discussion)
   if (discussion.comments.length === 0) {
     container.querySelector('.no-comments').style.display = 'block'
   }
@@ -71,7 +64,15 @@ const clickDiscussion = async () => {
   container.querySelector('.messages').innerHTML = messages.join()
 
   container.querySelector('.discussion-box').setAttribute('blockId', blockId)
-  selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
+
+  if (hasBlockId) {
+    console.log(blockId)
+    pageContent
+      .querySelectorAll(`[data-block-id*=${blockId}]`)[0]
+      .insertAdjacentHTML('afterend', container.innerHTML)
+  } else {
+    selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
+  }
 }
 
 // Select the node that will be observed for mutations
@@ -109,7 +110,7 @@ const callback = function (mutationsList, observer) {
       newNode.classList.add('discussion-context')
       newNode2.classList.add('discussion-context-text')
       newNode.appendChild(newNode2)
-      newNode.onclick = clickDiscussion
+      newNode.onclick = () => clickDiscussion()
 
       let commentDivBlock =
         bubbles.parentElement.parentElement.parentElement.parentElement
@@ -146,4 +147,18 @@ scriptsToAppend.forEach((scriptUrl) => {
     this.remove()
   }
   ;(document.head || document.documentElement).appendChild(s)
+})
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // listen for messages sent from background.js
+  if (request.message === 'hello!') {
+    if (document.querySelector('#header-list')) {
+      document.querySelector('#header-list').remove()
+    }
+    setTimeout(() => {
+      let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
+      showHeadings(headings)
+      showDeletedDiscussions()
+    }, 2000)
+  }
 })

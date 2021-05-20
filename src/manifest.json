@@ -3,6 +3,10 @@
   "name": "Notion Discussion Extension",
   "version": "1.0.0",
   "description": "Notion Extension",
+  "permissions": ["tabs"],
+  "background": {
+    "scripts": ["background.js"]
+  },
   "content_scripts": [
     {
       "matches": ["https://www.notion.so/*"],
@@ -14,7 +18,8 @@
         "getCurrentUser.js",
         "headings.js",
         "showDeletedDiscussions.js",
-        "deleteDiscussion.js"
+        "deleteDiscussion.js",
+        "showCommentIcons.js"
       ],
       "run_at": "document_end"
     }
