@@ -220,6 +220,17 @@ exports.getPostDiscussions = functions.https.onRequest((req, res) => {
         (discussion) => discussion.deleted === false
       )
 
+      for (const discussion of currentDiscussions) {
+        const commentsRef = await admin
+          .firestore()
+          .collection('comments')
+          .where('blockId', '==', discussion.blockId)
+          .orderBy('date', 'desc')
+          .get()
+
+        discussion.messages = commentsRef.size
+      }
+
       return res.json({ deletedDiscussions, currentDiscussions })
     } catch (error) {
       res.send(error)

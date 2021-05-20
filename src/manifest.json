@@ -14,7 +14,8 @@
         "getCurrentUser.js",
         "headings.js",
         "showDeletedDiscussions.js",
-        "deleteDiscussion.js"
+        "deleteDiscussion.js",
+        "showCommentIcons.js"
       ],
       "run_at": "document_end"
     }
