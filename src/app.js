@@ -12,19 +12,6 @@ function getCurrentBlockId() {
   } else return null
 }
 
-// const clickDeletedDiscussion = async () => {
-//   let response = await fetch(chrome.runtime.getURL('/template.html'))
-//   let html = await response.text()
-
-//   let container = document.createElement('div')
-//   container.id = 'deleted-discussion'
-//   container.innerHTML = html
-//   container.querySelector('.comment-box').style.display = 'none'
-
-//   const deletedBlocksList = document.getElementById('deleted-blocks-list')
-//   deletedBlocksList.append(container)
-// }
-
 const clickDiscussion = async (hasBlockId) => {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
@@ -38,13 +25,13 @@ const clickDiscussion = async (hasBlockId) => {
 
   if (hasBlockId) {
     blockId = hasBlockId
-    discussion = await getDiscussion(getCurrentId(), blockId)
   }
 
   if (!hasBlockId && selectedBlock.length > 0) {
     blockId = selectedBlock[0].attributes['0'].value
-    discussion = await getDiscussion(getCurrentId(), blockId)
   }
+
+  discussion = await getDiscussion(getCurrentId(), blockId)
 
   let response = await fetch(chrome.runtime.getURL('/template.html'))
   let html = await response.text()
@@ -53,6 +40,7 @@ const clickDiscussion = async (hasBlockId) => {
   let container = document.createElement('div')
   container.innerHTML = html
 
+  console.log(discussion)
   if (discussion.comments.length === 0) {
     container.querySelector('.no-comments').style.display = 'block'
   }
@@ -143,7 +131,6 @@ setTimeout(() => {
   let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
   showHeadings(headings)
   showDeletedDiscussions()
-  // showCommentIcons()
 }, 2000)
 
 const scriptsToAppend = [
@@ -160,4 +147,18 @@ scriptsToAppend.forEach((scriptUrl) => {
     this.remove()
   }
   ;(document.head || document.documentElement).appendChild(s)
+})
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // listen for messages sent from background.js
+  if (request.message === 'hello!') {
+    if (document.querySelector('#header-list')) {
+      document.querySelector('#header-list').remove()
+    }
+    setTimeout(() => {
+      let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
+      showHeadings(headings)
+      showDeletedDiscussions()
+    }, 2000)
+  }
 })

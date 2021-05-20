@@ -24,8 +24,7 @@ let msgIconHTML = `<div style='width: 0px; height: 0px;'>
 function showCommentIcons(currentDiscussions) {
   let pageContent = document.querySelector('.notion-page-content')
   let pageContentElements = [...pageContent.children]
-  // pageContent.querySelectorAll(`[data-block-id]`)
-  console.log(currentDiscussions)
+
   currentDiscussions.forEach((discussion) => {
     if (discussion.messages > 0) {
       const selectedBlock = pageContentElements.filter(

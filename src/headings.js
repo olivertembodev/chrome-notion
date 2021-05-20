@@ -9,6 +9,7 @@ function showHeadings(headers) {
     ).parentElement
 
     let headerList = document.createElement('ul')
+    headerList.id = 'header-list'
 
     headers.forEach((elem, index) => {
       elem.id = `header-${index}`
