@@ -17,8 +17,7 @@ capture data in chrome extension
 [X] show discussions on deleted block
 [X] Other icon for message (or maybe the same one, get number of comments and display it there)
 [X] bug: on page change it has to be refreshed, because it's react
-
-[ ] have comments opened per user
+[X] have comments opened per user
 
 <br>
 DB SCHEMA:<br>
