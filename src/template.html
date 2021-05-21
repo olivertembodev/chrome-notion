@@ -1,5 +1,6 @@
 <div class="discussion-box">
-    <button class="collapse" onclick="this.parentElement.remove()">
+    <button class="collapse"
+        onclick="this.parentElement.remove();closeDiscussion(this.parentElement.attributes.blockid.value);">
         Collapse
     </button>
     <div class="no-comments" style="display: none;">This block has 0 comments. Start a discussion!</div>

@@ -40,7 +40,6 @@ const clickDiscussion = async (hasBlockId) => {
   let container = document.createElement('div')
   container.innerHTML = html
 
-  console.log(discussion)
   if (discussion.comments.length === 0) {
     container.querySelector('.no-comments').style.display = 'block'
   }
@@ -66,13 +65,34 @@ const clickDiscussion = async (hasBlockId) => {
   container.querySelector('.discussion-box').setAttribute('blockId', blockId)
 
   if (hasBlockId) {
-    console.log(blockId)
     pageContent
-      .querySelectorAll(`[data-block-id*=${blockId}]`)[0]
+      .querySelectorAll(`[data-block-id*='${blockId}']`)[0]
       .insertAdjacentHTML('afterend', container.innerHTML)
   } else {
     selectedBlock[0].insertAdjacentHTML('afterend', container.innerHTML)
   }
+
+  const extensionObj = JSON.parse(localStorage.extension)
+  const consoleDiscussions = extensionObj.discussions
+
+  let consoleItem = consoleDiscussions.filter(
+    (elem) => elem.blockId === blockId
+  )
+  const selectedItem = consoleItem[0]
+
+  if (selectedItem) {
+    const idx = consoleDiscussions.findIndex(
+      (elem) => elem.blockId === selectedItem.blockId
+    )
+    consoleDiscussions[idx].show = true
+  } else {
+    consoleDiscussions.push({ blockId, show: true })
+  }
+
+  localStorage.setItem(
+    'extension',
+    JSON.stringify({ discussions: consoleDiscussions })
+  )
 }
 
 // Select the node that will be observed for mutations
@@ -127,14 +147,16 @@ const observer = new MutationObserver(callback)
 observer.observe(targetNode, config)
 
 // onMount
-setTimeout(() => {
+setTimeout(async () => {
   let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
   showHeadings(headings)
-  showDeletedDiscussions()
+  let discussions = await showDeletedDiscussions()
+  openDiscussions(discussions.currentDiscussions)
 }, 2000)
 
 const scriptsToAppend = [
   'sendComment.js',
+  'openDiscussions.js',
   'deleteDiscussion.js',
   'getCurrentUser.js',
   'getCurrentDate.js',
@@ -159,6 +181,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
       showHeadings(headings)
       showDeletedDiscussions()
+      openDiscussion()
     }, 2000)
   }
 })

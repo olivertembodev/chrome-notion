@@ -19,7 +19,8 @@
         "headings.js",
         "showDeletedDiscussions.js",
         "deleteDiscussion.js",
-        "showCommentIcons.js"
+        "showCommentIcons.js",
+        "openDiscussions.js"
       ],
       "run_at": "document_end"
     }
@@ -29,6 +30,7 @@
     "getCurrentUser.js",
     "getCurrentDate.js",
     "sendComment.js",
-    "deleteDiscussion.js"
+    "deleteDiscussion.js",
+    "openDiscussions.js"
   ]
 }

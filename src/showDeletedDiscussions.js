@@ -1,10 +1,4 @@
 async function showDeletedDiscussions() {
-  const pageContent = document.querySelector('.notion-page-content')
-  const pageContentElements = [...pageContent.children]
-  const currentBlocks = pageContentElements.map(
-    (elem) => elem.attributes['0'].value
-  )
-
   const response = await fetch(
     'http://localhost:5001/chrome-notion/us-central1/getPostDiscussions',
     {
@@ -14,7 +8,6 @@ async function showDeletedDiscussions() {
       },
       body: JSON.stringify({
         notionId: getCurrentId(),
-        currentBlocks,
       }),
     }
   )
@@ -33,6 +26,7 @@ async function showDeletedDiscussions() {
   page.prepend(myDiv)
 
   showCommentIcons(currentDiscussions)
+  return data
 }
 
 const clickDeletedDiscussion = async (blockId) => {
