@@ -20,7 +20,6 @@ async function sendComment(message, blockId, messagesDiv) {
       }
     )
     let data = await res.json()
-    console.log(data)
 
     let messageDiv = document.createElement('div')
     messageDiv.innerHTML = `

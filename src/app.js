@@ -116,7 +116,6 @@ const callback = function (mutationsList, observer) {
       trashButton.addEventListener('click', async () => {
         const currentBlockId = getCurrentBlockId()
         let res = await deleteDiscussion(currentBlockId)
-        console.log(res)
       })
 
       // for discussion button

@@ -45,7 +45,6 @@ const clickDeletedDiscussion = async (blockId) => {
   container.querySelector('.comment-box').style.display = 'none'
 
   let discussion = await getDiscussion(getCurrentId(), blockId)
-  console.log(discussion)
 
   if (discussion.comments.length === 0) {
     container.querySelector('.no-comments').style.display = 'block'

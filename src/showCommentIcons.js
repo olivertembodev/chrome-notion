@@ -39,7 +39,6 @@ function showCommentIcons(currentDiscussions) {
       msgIconDiv.querySelector('.notion-focusable').onclick = (e) => {
         e.stopPropagation()
         clickDiscussion(block.attributes['0'].value)
-        console.log('comment clicked', block.attributes['0'].value)
       }
 
       block
