@@ -60,7 +60,7 @@ const clickDiscussion = async (hasBlockId) => {
     return messageDiv.outerHTML
   })
 
-  container.querySelector('.messages').innerHTML = messages.join()
+  container.querySelector('.messages').innerHTML = messages.join('')
 
   container.querySelector('.discussion-box').setAttribute('blockId', blockId)
 
@@ -175,12 +175,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'hello!') {
     if (document.querySelector('#header-list')) {
       document.querySelector('#header-list').remove()
-    }
-    setTimeout(() => {
       let headings = [...document.querySelectorAll(`[placeholder="Heading 1"]`)]
       showHeadings(headings)
-      showDeletedDiscussions()
-      openDiscussion()
+    }
+
+    setTimeout(async () => {
+      if (!document.querySelector('#header-list')) {
+        let headings = [
+          ...document.querySelectorAll(`[placeholder="Heading 1"]`),
+        ]
+        showHeadings(headings)
+      }
+
+      let discussions = await showDeletedDiscussions()
+      openDiscussions(discussions.currentDiscussions)
     }, 2000)
   }
 })

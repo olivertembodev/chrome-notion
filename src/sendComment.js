@@ -19,7 +19,6 @@ async function sendComment(message, blockId, messagesDiv) {
         }),
       }
     )
-    let data = await res.json()
 
     let messageDiv = document.createElement('div')
     messageDiv.innerHTML = `
